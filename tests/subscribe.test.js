@@ -1,7 +1,7 @@
 import { describe, expect, test, expectTypeOf, vi, beforeEach } from 'vitest'
 import { Radius } from '../main';
 
-describe('subscribe', () => {
+describe('subscribe/unsubscribe', () => {
 
     let radius = new Radius();
     const mockData = {test: "Testing nav update event" };
