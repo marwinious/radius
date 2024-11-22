@@ -12,7 +12,7 @@ export default defineConfig({
             entry: resolve(__dirname, 'main.js'),
             name: 'Radius',
             // the proper extensions will be added
-            fileName: 'radius',
+            fileName: 'radius.min.js',
         },
         rollupOptions: {
             output: {
@@ -20,7 +20,8 @@ export default defineConfig({
                 // for externalized deps
                 format: 'esm',
                 sourcemap: false,
-                entryFileNames: `[name].js`,
+                // entryFileNames: `[name].js`,
+                entryFileNames: `radius.min.js`,
                 chunkFileNames: `[name].js`,
                 // assetFileNames: `assets/[name].[ext]`,
                 assetFileNames: (assetInfo) => {
