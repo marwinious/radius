@@ -1,28 +1,59 @@
 
 export class RadiusBase {
 
-    #state = {}
-    #listeners = [];
+    #states = {}
+    #events = {};
 
-    constructor(initialState={}) {
-        this.#state = initialState;
+    constructor() {
+        
     }
 
-    subscribe(listener) {
-        /*
-        This is where we need to allow for event names to subscribe to and then notifications need to be event-based.'
-        If we only allow a general subscription, then all listeners will fire on any event that causes the state to change.
-        This ios important if we want to use this as a singleton for multiple scenarios (e.g. global to app, app feature, single component/file, etc.)
-        */
+    getState(event) {
+        return this.#states[event] || {};
     }
 
-    notify() {
-        this.#listeners.forEach((listener) => { listener(this.state) }) // Trigger listener callback and pass current state
+    setState(event, newState) {
+        // Init event state and subscribers if it doesn't exist
+        this.initEvent(event);
+
+        // Merge new state with current state
+        this.#states[event] = {...this.#states[event], ...newState}
+
+        // Notify event subscribers of event state changes
+        this.notify(event);
     }
 
-    get state() { return this.#state }
-    set state(newState) {
-        this.#state = {...this.#state, ...newState} // Merge new state with current state
-        this.notify() // Notify listeners of state changes
+    subscribe(event, callbackFn) {
+        // Make sure we're getting a function for the callback
+        if(typeof callbackFn !== 'function') { throw new Error("Subscriber callbacks must be functions") } 
+
+        // Init event if it doesn't exist
+        this.initEvent(event);
+
+        // Add callback to event
+        this.#events[event].push(callbackFn) 
     }
+
+    initEvent(event) {
+        if(!this.#states[event]) { 
+            this.#states[event] = {};
+            this.#events[event] = [];
+        }
+    }
+
+    unsubscribe(event, callbackFn) {
+        // Filter event to only items that do not match the callbackFn (it will be omitted)
+        this.#events[event] = this.#events[event].filter((sub) => {
+            return sub !== callbackFn
+        })
+    }
+
+    notify(event) {
+        if(this.#events.hasOwnProperty(event)) {
+            this.#events[event].forEach((subscriber) => {
+                subscriber(this.getState(event));
+            })
+        }
+    }
+
 }
