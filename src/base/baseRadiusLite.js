@@ -3,6 +3,7 @@ export class RadiusLiteBase {
 
     #state = {};
     #subscribers = [];
+    #actions = {};
 
     constructor(initialState = {}) {
         this.#state = initialState;
@@ -24,6 +25,27 @@ export class RadiusLiteBase {
         if(subscriberIndex >= 0) {
             // Remove from subscribers array
             this.#subscribers.splice(subscriberIndex, 1);
+        }
+    }
+
+    addAction(actionName, mutatorFn) {
+        // Make sure we're getting a function for the callback
+        if(typeof mutatorFn !== 'function') { throw new Error("Action callbacks must be functions") } 
+
+        // Add action to list of actions
+        this.#actions[actionName] = mutatorFn;
+    }
+
+    runAction(actionName, ...args) {
+        const action = this.#actions[actionName];
+        if(action) {
+            const newState = action(this.#state, ...args);
+            if(newState) {
+                this.state = newState;
+            }
+        }
+        else {
+            console.warn(`Action "${actionName}" not found`);
         }
     }
 
