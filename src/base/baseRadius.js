@@ -3,6 +3,7 @@ export class RadiusBase {
 
     #states = {}
     #events = {};
+    #actions = {};
 
     constructor() {
         
@@ -46,6 +47,32 @@ export class RadiusBase {
         this.#events[event] = this.#events[event].filter((sub) => {
             return sub !== callbackFn
         })
+    }
+
+    addAction(event, actionName, mutatorFn) {
+        // Make sure we're getting a function for the callback
+        if(typeof mutatorFn !== 'function') { throw new Error("Action callbacks must be functions") } 
+
+        // Initialize the event category if it doesn't exist
+        if(!this.#actions[event]) { 
+            this.#actions[event] = {} 
+        }
+
+        // Add action to list of actions
+        this.#actions[event][actionName] = mutatorFn;
+    }
+
+    runAction(event, actionName, ...args) {
+        const action = this.#actions[event]?.[actionName];
+        if(action) {
+            const newState = action(this.#states[event], ...args);
+            if(newState) {
+                this.setState(event, newState);
+            }
+        }
+        else {
+            console.warn(`Action "${actionName}" for event "${event} not found"`);
+        }
     }
 
     notify(event) {
