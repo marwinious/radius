@@ -48,4 +48,40 @@ describe('actions', () => {
         expect(radius.getState(mockEvent)).toMatchObject(mockActionMergeReturn);
     })
 
+    test('should create a counter action that correctly increments', () => {
+        const mockCallback = vi.fn(() => mockResponse)
+
+        radius.subscribe(mockEvent, mockCallback)
+        radius.setState(mockEvent, { counter: 0 })
+
+        radius.addAction(mockEvent, 'incrementCounter', (state) => {
+            return {...state, counter: state.counter+1 } // Overwrites "counter" with new value in state
+        })
+
+        radius.runAction(mockEvent, 'incrementCounter');
+        console.log(radius.getState(mockEvent));
+        
+        expect(radius.getState(mockEvent).counter).toBe(1);
+    })
+
+    test('should create an action that adds user data', () => {
+        const mockCallback = vi.fn(() => mockResponse)
+        const newUser = { name: "John Does", age: "30" }
+        const initialState = { notAUser: true, user: {} }
+        const updatedState = {...initialState, user: newUser}
+
+        radius.subscribe(mockEvent, mockCallback)
+        radius.setState(mockEvent, initialState)
+
+        radius.addAction(mockEvent, 'addUser', (state, user) => {
+            return {...state, user } // Adds or Overwrites "user" with new value in state
+        })
+
+        radius.runAction(mockEvent, 'addUser', newUser);
+        console.log(updatedState);
+        console.log(radius.getState(mockEvent));
+        
+        expect(radius.getState(mockEvent)).toMatchObject(updatedState)
+    })
+
 })
