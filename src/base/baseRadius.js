@@ -71,7 +71,7 @@ export class RadiusBase {
             }
         }
         else {
-            console.warn(`Action "${actionName}" for event "${event} not found"`);
+            console.warn(`Action "${actionName}" for event "${event}" not found`);
         }
     }
 
