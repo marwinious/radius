@@ -1,4 +1,4 @@
-import { Radius } from "./src/base/radius";
+import { Radius } from "./src/radius";
 import { RadiusLite } from "./src/radiusLite";
 
 export { Radius, RadiusLite }
