@@ -14,15 +14,23 @@ export class RadiusBase {
     }
 
     setState(event, newState) {
+        // Set state
+        const stateReturn = this.setStateOnly(event, newState)
+
+        // Notify event subscribers of event state changes
+        this.notify(event);
+
+        // Return
+        return stateReturn
+    }
+
+    setStateOnly(event, newState) {
         // Init event state and subscribers if it doesn't exist
         this.initEvent(event);
         const previousState = this.#states[event];
 
         // Merge new state with current state
         this.#states[event] = {...this.#states[event], ...newState}
-
-        // Notify event subscribers of event state changes
-        this.notify(event);
 
         // Return
         return {
