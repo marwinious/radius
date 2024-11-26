@@ -36,6 +36,7 @@ The data from my callback is: {
 ```
 
 **To unsubscribe from an event:**
+To programatically unsubscribe from an event you will need to retain a reference to the callback that was part of the original subscription and pass that into the unsubscribe method.
 
 ```javascript
 import { Radius } from './path/to/radius'
@@ -68,6 +69,32 @@ The data from my callback is: {
 }
 ```
 (no data from the second state update will display because the subscriber callback has been removed)
+
+**Easier Unsubscribe Option**
+When subscribing to an event, the subscription method will return an object of useful information, including an unsubscribe method. If you capture the return from a subscription, you can pass or store that reference anywhere and simply call the `.unsubcribe()` method on that reference.
+
+```javascript
+import { Radius } from './path/to/radius'
+
+// Init Radius
+const radius = new Radius();
+const myEventLabel = 'some-event-label';
+
+// Define a callback for your subscription. Keep this handy if you want to unsubscribe later.
+const someCallback = (data) => { console.log('The data from my callback is: ', data) }
+
+// Subscribe to an event
+const someEvent = radius.subscribe(myEventLabel, someCallback);
+
+// Add some data to the state for this event
+radius.setState(myEventLabel, { test: "This is a test value in my state data" })
+
+// Unsubscribe from the event via the captured return
+someEvent.unsubscribe()
+
+// Add some more data to the state for this event
+radius.setState(myEventLabel, { test: "This is a test value in my state data", anotherTest: "More data" })
+```
 
 ### Adding Actions
 You can setup "actions" in Radius to handle re-usable patterns with differing inputs. These actions can be called by any file that imports the instance of Radius where the action was defined.
@@ -198,6 +225,31 @@ The data from my callback is: {
 }
 ```
 (no data from the second state update will display because the subscriber callback has been removed)
+
+**Easier Unsubscribe Option**
+When subscribing to an event, the subscription method will return an object of useful information, including an unsubscribe method. If you capture the return from a subscription, you can pass or store that reference anywhere and simply call the `.unsubcribe()` method on that reference.
+
+```javascript
+import { RadiusLite } from './path/to/radius'
+
+// Init Radius
+const radius = new RadiusLite();
+
+// Define a callback for your subscription. Keep this handy if you want to unsubscribe later.
+const someCallback = (data) => { console.log('The data from my callback is: ', data) }
+
+// Subscribe to an event
+const subscription = radius.subscribe(someCallback);
+
+// Add some data to the state for this event
+radius.state = { test: "This is a test value in my state data" }
+
+// Unsubscribe from the event using the captured return
+subscription.unsubscribe();
+
+// Add some more data to the state for this event
+radius.state = { test: "This is a test value in my state data", anotherTest: "More data" }
+```
 
 ### Adding Actions
 You can setup "actions" in Radius to handle re-usable patterns with differing inputs. These actions can be called by any file that imports the instance of Radius where the action was defined.

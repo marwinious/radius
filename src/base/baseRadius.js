@@ -16,12 +16,20 @@ export class RadiusBase {
     setState(event, newState) {
         // Init event state and subscribers if it doesn't exist
         this.initEvent(event);
+        const previousState = this.#states[event];
 
         // Merge new state with current state
         this.#states[event] = {...this.#states[event], ...newState}
 
         // Notify event subscribers of event state changes
         this.notify(event);
+
+        // Return
+        return {
+            event: event,
+            newState: newState,
+            previousState: previousState
+        }
     }
 
     subscribe(event, callbackFn) {
@@ -33,6 +41,14 @@ export class RadiusBase {
 
         // Add callback to event
         this.#events[event].push(callbackFn) 
+
+        // Return
+        return {
+            event: event,
+            callback: callbackFn,
+            unsubscribe: () => { this.unsubscribe(event, callbackFn) }
+        }
+
     }
 
     initEvent(event) {
@@ -40,13 +56,32 @@ export class RadiusBase {
             this.#states[event] = {};
             this.#events[event] = [];
         }
+        else {
+            console.warn(`Event "${event}" already exists`)
+        }
     }
 
     unsubscribe(event, callbackFn) {
+        let unsubscribedFromEvent = false;
+
         // Filter event to only items that do not match the callbackFn (it will be omitted)
         this.#events[event] = this.#events[event].filter((sub) => {
+            if(sub === callbackFn) { unsubscribedFromEvent = true }
             return sub !== callbackFn
         })
+
+        if(unsubscribedFromEvent) {
+            return {
+                event: event,
+                unsubscribedCallback: callbackFn
+            }
+        }
+
+        return {
+            event: event,
+            unsubscribedCallback: "not found"
+        }
+
     }
 
     addAction(event, actionName, mutatorFn) {
@@ -60,6 +95,12 @@ export class RadiusBase {
 
         // Add action to list of actions
         this.#actions[event][actionName] = mutatorFn;
+
+        return {
+            event: event,
+            actionName: actionName,
+            mutator: mutatorFn
+        }
     }
 
     runAction(event, actionName, ...args) {
@@ -67,7 +108,13 @@ export class RadiusBase {
         if(action) {
             const newState = action(this.#states[event], ...args);
             if(newState) {
+                const previousState = this.getState(event);
                 this.setState(event, newState);
+
+                return {
+                    newState: this.getState(event),
+                    previousState: previousState
+                }
             }
         }
         else {
@@ -76,10 +123,19 @@ export class RadiusBase {
     }
 
     notify(event) {
+        const notifiedSubscribers = [];
+        const eventState = this.getState(event);
+
         if(this.#events.hasOwnProperty(event)) {
             this.#events[event].forEach((subscriber) => {
-                subscriber(this.getState(event));
+                subscriber(eventState);
+                notifiedSubscribers.push(subscriber);
             })
+        }
+
+        return { 
+            event: event,
+            notifiedSubscribers: notifiedSubscribers
         }
     }
 
