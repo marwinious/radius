@@ -1,32 +1,46 @@
-class e {
+class c {
   #t = {};
   #s = {};
+  #i = {};
   constructor() {
   }
-  getState(s) {
-    return this.#t[s] || {};
+  getState(t) {
+    return this.#t[t] || {};
   }
-  setState(s, t) {
-    this.initEvent(s), this.#t[s] = { ...this.#t[s], ...t }, this.notify(s);
+  setState(t, s) {
+    this.initEvent(t), this.#t[t] = { ...this.#t[t], ...s }, this.notify(t);
   }
-  subscribe(s, t) {
-    if (typeof t != "function")
+  subscribe(t, s) {
+    if (typeof s != "function")
       throw new Error("Subscriber callbacks must be functions");
-    this.initEvent(s), this.#s[s].push(t);
+    this.initEvent(t), this.#s[t].push(s);
   }
-  initEvent(s) {
-    this.#t[s] || (this.#t[s] = {}, this.#s[s] = []);
+  initEvent(t) {
+    this.#t[t] || (this.#t[t] = {}, this.#s[t] = []);
   }
-  unsubscribe(s, t) {
-    this.#s[s] = this.#s[s].filter((r) => r !== t);
+  unsubscribe(t, s) {
+    this.#s[t] = this.#s[t].filter((i) => i !== s);
   }
-  notify(s) {
-    this.#s.hasOwnProperty(s) && this.#s[s].forEach((t) => {
-      t(this.getState(s));
+  addAction(t, s, i) {
+    if (typeof i != "function")
+      throw new Error("Action callbacks must be functions");
+    this.#i[t] || (this.#i[t] = {}), this.#i[t][s] = i;
+  }
+  runAction(t, s, ...i) {
+    const o = this.#i[t]?.[s];
+    if (o) {
+      const r = o(this.#t[t], ...i);
+      r && this.setState(t, r);
+    } else
+      console.warn(`Action "${s}" for event "${t}" not found`);
+  }
+  notify(t) {
+    this.#s.hasOwnProperty(t) && this.#s[t].forEach((s) => {
+      s(this.getState(t));
     });
   }
 }
-class u extends e {
+class e extends c {
   constructor() {
     super();
   }
@@ -34,40 +48,54 @@ class u extends e {
 class h {
   #t = {};
   #s = [];
-  constructor(s = {}) {
-    this.#t = s;
+  #i = {};
+  constructor(t = {}) {
+    this.#t = t;
   }
-  subscribe(s) {
-    if (typeof s != "function")
+  subscribe(t) {
+    if (typeof t != "function")
       throw new Error("Subscriber callbacks must be functions");
-    this.#s.push(s);
+    this.#s.push(t);
   }
-  unsubscribe(s) {
-    const t = this.#s.indexOf(s);
-    t >= 0 && this.#s.splice(t, 1);
+  unsubscribe(t) {
+    const s = this.#s.indexOf(t);
+    s >= 0 && this.#s.splice(s, 1);
+  }
+  addAction(t, s) {
+    if (typeof s != "function")
+      throw new Error("Action callbacks must be functions");
+    this.#i[t] = s;
+  }
+  runAction(t, ...s) {
+    const i = this.#i[t];
+    if (i) {
+      const o = i(this.#t, ...s);
+      o && (this.state = o);
+    } else
+      console.warn(`Action "${t}" not found`);
   }
   notify() {
     this.#s.forEach(
-      (s) => (
+      (t) => (
         // Call the subscriber's callback and pass the current state
-        s(this.state)
+        t(this.state)
       )
     );
   }
   get state() {
     return this.#t;
   }
-  set state(s) {
-    this.#t = { ...this.#t, ...s }, this.notify();
+  set state(t) {
+    this.#t = { ...this.#t, ...t }, this.notify();
   }
 }
-class c extends h {
+class u extends h {
   constructor() {
     super();
   }
 }
 export {
-  u as Radius,
-  c as RadiusLite
+  e as Radius,
+  u as RadiusLite
 };
 //# sourceMappingURL=radius_state_manager.js.map
