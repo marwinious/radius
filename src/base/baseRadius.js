@@ -56,9 +56,6 @@ export class RadiusBase {
             this.#states[event] = {};
             this.#events[event] = [];
         }
-        else {
-            console.warn(`Event "${event}" already exists`)
-        }
     }
 
     unsubscribe(event, callbackFn) {
