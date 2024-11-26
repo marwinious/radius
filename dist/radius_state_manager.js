@@ -1,4 +1,4 @@
-class u {
+class o {
   #t = {};
   #s = {};
   #i = {};
@@ -28,7 +28,7 @@ class u {
     };
   }
   initEvent(t) {
-    this.#t[t] ? console.warn(`Event "${t}" already exists`) : (this.#t[t] = {}, this.#s[t] = []);
+    this.#t[t] || (this.#t[t] = {}, this.#s[t] = []);
   }
   unsubscribe(t, s) {
     let i = !1;
@@ -54,10 +54,10 @@ class u {
     if (r) {
       const e = r(this.#t[t], ...i);
       if (e) {
-        const o = this.getState(t);
+        const u = this.getState(t);
         return this.setState(t, e), {
           newState: this.getState(t),
-          previousState: o
+          previousState: u
         };
       }
     } else
@@ -73,7 +73,7 @@ class u {
     };
   }
 }
-class h extends u {
+class h extends o {
   constructor() {
     super();
   }
@@ -140,13 +140,13 @@ class c {
     this.#t = { ...this.#t, ...t }, this.notify();
   }
 }
-class a extends c {
+class f extends c {
   constructor() {
     super();
   }
 }
 export {
   h as Radius,
-  a as RadiusLite
+  f as RadiusLite
 };
 //# sourceMappingURL=radius_state_manager.js.map
