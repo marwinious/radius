@@ -35,7 +35,7 @@ The data from my callback is: {
 }
 ```
 
-To unsubscribe from an event:
+**To unsubscribe from an event:**
 
 ```javascript
 import { Radius } from './path/to/radius'
@@ -68,6 +68,70 @@ The data from my callback is: {
 }
 ```
 (no data from the second state update will display because the subscriber callback has been removed)
+
+### Adding Actions
+You can setup "actions" in Radius to handle re-usable patterns with differing inputs. These actions can be called by any file that imports the instance of Radius where the action was defined.
+
+```javascript
+import { Radius } from './path/to/radius'
+
+// Init
+const radius = new Radius()
+const eventLabel = 'some-event-label';
+const actionName = 'incrementCounter';
+
+// Setup initial state
+const initialState = { counter: 0 }
+radius.setState(eventLabel, initialState)
+
+// Define action
+radius.addAction(eventLabel, actionName, (state) => {
+    /*
+    Anything "returned" from an action is applied to the state of that event.
+    Be careful when defining actions to avoid wiping out existing state completely.
+    Use the spread operator (...) to help with merging items into state.
+    Running actions will trigger state update callbacks for the specified event.
+    */
+    return {...state, counter: state.counter+1 } // Overwrites "counter" with new value in state
+})
+
+// Run the defined action. This can be done from any file that has access to the instance where the action was defined.
+radius.runAction(eventLabel, actionName)
+```
+
+The counter property of our event state will change from 0 to 1 after the action is called once. Any subscribers to that event's state will receive the new state passed into the callback they registered when they originally subscribed.
+
+**Passing data into Actions**
+You can do more than simply create static actions that only do one thing over and over when called. You can setup actions to accept additional parameters that can be used in the action to update state.
+
+```javascript
+import { Radius } from './path/to/radius'
+
+// Init
+const radius = new Radius()
+const eventLabel = 'some-event-label';
+const actionName = 'changeName';
+
+// Setup initial state
+const initialState = { name: "John" }
+radius.setState(eventLabel, initialState)
+
+// Define action
+radius.addAction(eventLabel, actionName, (state, newName) => {
+    return {...state, name: newName } // Sets a new value for "name" in state
+})
+
+// Run the defined action. This can be done from any file that has access to the instance where the action was defined.
+radius.runAction(eventLabel, actionName, "Bob")
+
+// Alternatively, we could shorten things in our action setup like this...
+radius.addAction(eventLabel, actionName, (state, name) => {
+    return {...state, name } // Overwrites "name" with new value in state
+})
+radius.runAction(eventLabel, actionName, "Bob") // has the same effect as the original action
+```
+
+In the example above, the original "name" property in state will change from "John" to "Bob" after the action is called. Any new data can be passed into this action and it will always replace the "name" property with the data that was passed.
 
 ## "Lite" Simple Subscriptions
 There is a "lite" version of Radius built-in that facilitates bare-bones state management for when you want/need an even simpler solution.
@@ -102,7 +166,7 @@ The data from my callback is: {
 }
 ```
 
-To unsubscribe from the store:
+**To unsubscribe from state updates:**
 
 ```javascript
 import { RadiusLite } from './path/to/radius'
@@ -134,3 +198,65 @@ The data from my callback is: {
 }
 ```
 (no data from the second state update will display because the subscriber callback has been removed)
+
+### Adding Actions
+You can setup "actions" in Radius to handle re-usable patterns with differing inputs. These actions can be called by any file that imports the instance of Radius where the action was defined.
+
+```javascript
+import { Radius } from './path/to/radius'
+
+// Init
+const radius = new Radius()
+const actionName = 'incrementCounter';
+
+// Setup initial state
+const initialState = { counter: 0 }
+radius.state = initialState;
+
+// Define action
+radius.addAction(actionName, (state) => {
+    /*
+    Anything "returned" from an action is applied to state.
+    Be careful when defining actions to avoid wiping out existing state completely.
+    Use the spread operator (...) to help with merging items into state.
+    Running actions will trigger state update callbacks for subscribers.
+    */
+    return {...state, counter: state.counter+1 } // Overwrites "counter" with new value in state
+})
+
+// Run the defined action. This can be done from any file that has access to the instance where the action was defined.
+radius.runAction(actionName)
+```
+
+The counter property of our state will change from 0 to 1 after the action is called once. Any subscribers to that state will receive the new state passed into the callback they registered when they originally subscribed.
+
+**Passing data into Actions**
+You can do more than simply create static actions that only do one thing over and over when called. You can setup actions to accept additional parameters that can be used in the action to update state.
+
+```javascript
+import { Radius } from './path/to/radius'
+
+// Init
+const radius = new Radius()
+const actionName = 'changeName';
+
+// Setup initial state
+const initialState = { name: "John" }
+radius.state = initialState;
+
+// Define action
+radius.addAction(actionName, (state, newName) => {
+    return {...state, name: newName } // Sets a new value for "name" in state
+})
+
+// Run the defined action. This can be done from any file that has access to the instance where the action was defined.
+radius.runAction(actionName, "Bob")
+
+// Alternatively, we could shorten things in our action setup like this...
+radius.addAction(actionName, (state, name) => {
+    return {...state, name } // Overwrites "name" with new value in state
+})
+radius.runAction(actionName, "Bob") // has the same effect as the original action
+```
+
+In the example above, the original "name" property in state will change from "John" to "Bob" after the action is called. Any new data can be passed into this action and it will always replace the "name" property with the data that was passed.
