@@ -192,7 +192,7 @@ export class RadiusLiteBase {
 
                     // Loop through all watchers of this property and fire callbacks
                     propertyWatchers.forEach((watcher) => {
-                        watcher(newState);
+                        watcher(newState[key]);
                         notifiedWatchers.push(watcher);
                     })
                 }
