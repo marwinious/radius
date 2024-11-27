@@ -18,10 +18,10 @@ export class RadiusBase {
         const stateReturn = this.setStateOnly(event, newState)
 
         // Notify event subscribers of event state changes
-        this.notify(event, stateReturn.newState, stateReturn.previousState);
+        const notified = this.notify(event, stateReturn.newState, stateReturn.previousState);
 
         // Return
-        return stateReturn
+        return {...stateReturn, ...notified}
     }
 
     setStateOnly(event, newState) {
@@ -182,7 +182,8 @@ export class RadiusBase {
         const notifiedSubscribers = [];
         const eventState = this.getState(event);
         let notifyWatchers = {
-            notifiedWatchers: []
+            notifiedWatchers: [],
+            changedProperties: []
         };
 
         if(this.#events.hasOwnProperty(event)) {
@@ -200,11 +201,13 @@ export class RadiusBase {
             event: event,
             notifiedSubscribers: notifiedSubscribers,
             notifiedWatchers: notifyWatchers.notifiedWatchers,
+            changedProperties: notifyWatchers.changedProperties
         }
     }
 
     notifyWatchers(event, newState, previousState) {
         const notifiedWatchers = [];
+        const changedProperties = [];
         const watchers = this.#events[event].watchers;
 
         // Loop through previousState to find matches for watched properties
@@ -215,6 +218,7 @@ export class RadiusBase {
                 if(previousState[key] !== newState[key]) {
                     // Something changed on this property, so we need to notify all watchers
                     const propertyWatchers = watchers.properties[key];
+                    changedProperties.push(key);
 
                     // Loop through all watchers of this property and fire callbacks
                     propertyWatchers.forEach((watcher) => {
@@ -227,7 +231,8 @@ export class RadiusBase {
 
         return {
             event: event,
-            notifiedWatchers: notifiedWatchers
+            notifiedWatchers: notifiedWatchers,
+            changedProperties: changedProperties
         }
     }
 
