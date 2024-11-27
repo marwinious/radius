@@ -26,7 +26,7 @@ class RadiusBase {
     setStateOnly(event, newState) {
         // Init event state and subscribers if it doesn't exist
         this.initEvent(event);
-        const previousState = this.#states[event];
+        const previousState = structuredClone(this.#states[event]);
 
         // Merge new state with current state
         this.#states[event] = {...this.#states[event], ...newState};
@@ -161,14 +161,13 @@ class RadiusBase {
     runAction(event, actionName, ...args) {
         const action = this.#actions[event]?.[actionName];
         if(action) {
-            const newState = action(this.#states[event], ...args);
+            const newState = action(structuredClone(this.#states[event]), ...args);
             if(newState) {
-                const previousState = this.getState(event);
-                this.setState(event, newState);
+                const setState = this.setState(event, newState);
 
                 return {
-                    newState: this.getState(event),
-                    previousState: previousState
+                    newState: setState.newState,
+                    previousState: setState.previousState
                 }
             }
         }
