@@ -96,7 +96,7 @@ someEvent.unsubscribe()
 radius.setState(myEventLabel, { test: "This is a test value in my state data", anotherTest: "More data" })
 ```
 
-### Adding Actions
+## Adding Actions
 You can setup "actions" in Radius to handle re-usable patterns with differing inputs. These actions can be called by any file that imports the instance of Radius where the action was defined.
 
 ```javascript
@@ -128,7 +128,7 @@ radius.runAction(eventLabel, actionName)
 
 The counter property of our event state will change from 0 to 1 after the action is called once. Any subscribers to that event's state will receive the new state passed into the callback they registered when they originally subscribed.
 
-**Passing data into Actions**
+### Passing data into Actions
 You can do more than simply create static actions that only do one thing over and over when called. You can setup actions to accept additional parameters that can be used in the action to update state.
 
 ```javascript
@@ -159,6 +159,43 @@ radius.runAction(eventLabel, actionName, "Bob") // has the same effect as the or
 ```
 
 In the example above, the original "name" property in state will change from "John" to "Bob" after the action is called. Any new data can be passed into this action and it will always replace the "name" property with the data that was passed.
+
+## Subscribing to a single property on an event
+If you only want a callback to fire when a single property changes on an event's state, use the `.watch()` method.
+
+The `.watch()` method accepts 3 parameters: an event label, a property label, and a callback function. 
+
+Usage: `.watch(eventLabel, propertyLabel, callback)`
+
+This returns an object that includes the standard `.unsubscribe()` method which can be called to stop watching a property.
+
+```javascript
+import { Radius } from './path/to/radius'
+
+// Init Radius
+const radius = new Radius();
+const myEventLabel = 'some-event-label';
+const sampleState = { name: "John", age: 30, eyeColor: "Blue" }
+const sampleChangedState = { name: "Jane", age: 30, eyeColor: "Blue" }
+
+// Define a callback for your subscription. Keep this handy if you want to unsubscribe later.
+const someCallback = (data) => { console.log('The data from my callback is: ', data) }
+
+// Initialize the state
+radius.setStateOnly(myEventLabel, sampleState);
+
+// Add a watcher
+const nameWatcher = radius.watch(myEventLabel, 'name', someCallback)
+
+// Update the state but only change the watched property
+radius.setState(myEventLabel, sampleChangedState)
+
+// "someCallback" will fire once as a results of the "name" change.
+// Changing a different property will not trigger the callback.
+
+// Unsubscribe the watcher
+nameWatcher.unsubscribe();
+```
 
 ## "Lite" Simple Subscriptions
 There is a "lite" version of Radius built-in that facilitates bare-bones state management for when you want/need an even simpler solution.
@@ -251,7 +288,7 @@ subscription.unsubscribe();
 radius.state = { test: "This is a test value in my state data", anotherTest: "More data" }
 ```
 
-### Adding Actions
+## Adding Actions
 You can setup "actions" in Radius to handle re-usable patterns with differing inputs. These actions can be called by any file that imports the instance of Radius where the action was defined.
 
 ```javascript
@@ -282,7 +319,7 @@ radius.runAction(actionName)
 
 The counter property of our state will change from 0 to 1 after the action is called once. Any subscribers to that state will receive the new state passed into the callback they registered when they originally subscribed.
 
-**Passing data into Actions**
+### Passing data into Actions
 You can do more than simply create static actions that only do one thing over and over when called. You can setup actions to accept additional parameters that can be used in the action to update state.
 
 ```javascript
@@ -312,3 +349,39 @@ radius.runAction(actionName, "Bob") // has the same effect as the original actio
 ```
 
 In the example above, the original "name" property in state will change from "John" to "Bob" after the action is called. Any new data can be passed into this action and it will always replace the "name" property with the data that was passed.
+
+## Subscribing to a single property in state
+If you only want a callback to fire when a single property changes in state, use the `.watch()` method.
+
+The `.watch()` method accepts 2 parameters: a property label and a callback function. 
+
+Usage: `.watch(propertyLabel, callback)`
+
+This returns an object that includes the standard `.unsubscribe()` method which can be called to stop watching a property.
+
+```javascript
+import { RadiusLite } from './path/to/radiusLite'
+
+// Init Radius
+const radius = new RadiusLite();
+const sampleState = { name: "John", age: 30, eyeColor: "Blue" }
+const sampleChangedState = { name: "Jane", age: 30, eyeColor: "Blue" }
+
+// Define a callback for your subscription. Keep this handy if you want to unsubscribe later.
+const someCallback = (data) => { console.log('The data from my callback is: ', data) }
+
+// Initialize the state
+radius.setStateOnly(sampleState);
+
+// Add a watcher
+const nameWatcher = radius.watch('name', someCallback)
+
+// Update the state but only change the watched property
+radius.setState(sampleChangedState) // could also use radius.state = sampleChangedData
+
+// "someCallback" will fire once as a results of the "name" change.
+// Changing a different property will not trigger the callback.
+
+// Unsubscribe the watcher
+nameWatcher.unsubscribe();
+```
