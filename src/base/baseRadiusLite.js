@@ -181,7 +181,11 @@ export class RadiusLiteBase {
             // If a watched property matches a previousState property
             if(watchers.properties.hasOwnProperty(key)) {
                 // Check if previousState property has changed in newState
-                if(previousState[key] !== newState[key]) {
+                const previousStateProperty = structuredClone(previousState[key]);
+                const newStateProperty = structuredClone(newState[key]);
+                const stayedTheSame = JSON.stringify(previousStateProperty) === JSON.stringify(newStateProperty);
+
+                if(!stayedTheSame) {
                     // Something changed on this property, so we need to notify all watchers
                     const propertyWatchers = watchers.properties[key];
                     changedProperties.push(key);
