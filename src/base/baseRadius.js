@@ -15,7 +15,7 @@ export class RadiusBase {
 
     setState(event, newState) {
         // Set state
-        const stateReturn = this.setStateOnly(event, newState)
+        const stateReturn = this.setStateOnly(event, newState);
 
         // Notify event subscribers of event state changes
         const notified = this.notify(event, stateReturn.newState, stateReturn.previousState);
@@ -27,10 +27,10 @@ export class RadiusBase {
     setStateOnly(event, newState) {
         // Init event state and subscribers if it doesn't exist
         this.initEvent(event);
-        const previousState = this.#states[event];
+        const previousState = structuredClone(this.#states[event]);
 
         // Merge new state with current state
-        this.#states[event] = {...this.#states[event], ...newState}
+        this.#states[event] = {...this.#states[event], ...newState};
 
         // Return
         return {
@@ -48,7 +48,7 @@ export class RadiusBase {
         this.initEvent(event);
 
         // Init property if it doesn't exist
-        if(!this.#events[event].watchers.properties[property]) { this.#events[event].watchers.properties[property] = [] }
+        if(!this.#events[event].watchers.properties[property]) { this.#events[event].watchers.properties[property] = []; }
 
         // Add callback to event
         this.#events[event].watchers.properties[property].push(callbackFn);
@@ -58,7 +58,7 @@ export class RadiusBase {
             event: event,
             property: property,
             callback: callbackFn,
-            unsubscribe: () => { this.stopWatcher(event, property, callbackFn) }
+            unsubscribe: () => { this.stopWatcher(event, property, callbackFn); }
         }
     }
 
@@ -70,13 +70,13 @@ export class RadiusBase {
         this.initEvent(event);
 
         // Add callback to event
-        this.#events[event].subscribers.push(callbackFn) 
+        this.#events[event].subscribers.push(callbackFn); 
 
         // Return
         return {
             event: event,
             callback: callbackFn,
-            unsubscribe: () => { this.unsubscribe(event, callbackFn) }
+            unsubscribe: () => { this.unsubscribe(event, callbackFn); }
         }
 
     }
@@ -98,9 +98,9 @@ export class RadiusBase {
 
         // Filter event to only items that do not match the callbackFn (it will be omitted)
         this.#events[event].subscribers = this.#events[event].subscribers.filter((sub) => {
-            if(sub === callbackFn) { unsubscribedFromEvent = true }
+            if(sub === callbackFn) { unsubscribedFromEvent = true; }
             return sub !== callbackFn
-        })
+        });
 
         if(unsubscribedFromEvent) {
             return {
@@ -121,9 +121,9 @@ export class RadiusBase {
 
         // Filter event to only items that do not match the callbackFn (it will be omitted)
         this.#events[event].watchers.properties[property] = this.#events[event].watchers.properties[property].filter((sub) => {
-            if(sub === callbackFn) { unsubscribedFromWatcher = true }
+            if(sub === callbackFn) { unsubscribedFromWatcher = true; }
             return sub !== callbackFn
-        })
+        });
 
         if(unsubscribedFromWatcher) {
             return {
@@ -146,7 +146,7 @@ export class RadiusBase {
 
         // Initialize the event category if it doesn't exist
         if(!this.#actions[event]) { 
-            this.#actions[event] = {} 
+            this.#actions[event] = {}; 
         }
 
         // Add action to list of actions
@@ -162,14 +162,13 @@ export class RadiusBase {
     runAction(event, actionName, ...args) {
         const action = this.#actions[event]?.[actionName];
         if(action) {
-            const newState = action(this.#states[event], ...args);
+            const newState = action(structuredClone(this.#states[event]), ...args);
             if(newState) {
-                const previousState = this.getState(event);
-                this.setState(event, newState);
+                const setState = this.setState(event, newState);
 
                 return {
-                    newState: this.getState(event),
-                    previousState: previousState
+                    newState: setState.newState,
+                    previousState: setState.previousState
                 }
             }
         }
@@ -191,10 +190,10 @@ export class RadiusBase {
             this.#events[event].subscribers.forEach((subscriber) => {
                 subscriber(eventState);
                 notifiedSubscribers.push(subscriber);
-            })
+            });
 
             // Notify watchers
-            notifyWatchers = this.notifyWatchers(event, newState, previousState)
+            notifyWatchers = this.notifyWatchers(event, newState, previousState);
         }
 
         return { 
@@ -224,10 +223,10 @@ export class RadiusBase {
                     propertyWatchers.forEach((watcher) => {
                         watcher(newState);
                         notifiedWatchers.push(watcher);
-                    })
+                    });
                 }
             }
-        })
+        });
 
         return {
             event: event,
