@@ -120,7 +120,7 @@ export class RadiusBase {
         let unsubscribedFromWatcher = false;
 
         // Filter event to only items that do not match the callbackFn (it will be omitted)
-        this.#events[event].watchers.properties[property] = this.#events[event].watchers.properties.filter((sub) => {
+        this.#events[event].watchers.properties[property] = this.#events[event].watchers.properties[property].filter((sub) => {
             if(sub === callbackFn) { unsubscribedFromWatcher = true }
             return sub !== callbackFn
         })
@@ -213,11 +213,14 @@ export class RadiusBase {
             if(watchers.properties.hasOwnProperty(key)) {
                 // Check if previousState property has changed in newState
                 if(previousState[key] !== newState[key]) {
-                    // Something changed on this property, so we need to notify
-                    const watcher = watchers.properties[key];
-                    watcher(newState);
+                    // Something changed on this property, so we need to notify all watchers
+                    const propertyWatchers = watchers.properties[key];
 
-                    notifiedWatchers.push(watcher);
+                    // Loop through all watchers of this property and fire callbacks
+                    propertyWatchers.forEach((watcher) => {
+                        watcher(newState);
+                        notifiedWatchers.push(watcher);
+                    })
                 }
             }
         })
