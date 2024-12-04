@@ -32,7 +32,7 @@ class RadiusBase {
             // Merge new state with current state
             this.#states[event] = {...this.#states[event], ...newState};
         }
-        else if(newState.constructor === String || newState.constructor === Array) {
+        else if(newState.constructor === String || newState.constructor === Array || newState.constructor === Number) {
             // Set specific event value to newState instead of spreading
             this.#states[event] = newState;
         }
