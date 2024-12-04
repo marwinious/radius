@@ -15,7 +15,7 @@ export default defineConfig({
             filename: "radius",
             formats: ['es'], // Ensure it is an ES module format
         },
-        sourcemap: true,
+        sourcemap: false,
         target: 'esnext',
         minify: false,
         // minify: terser, // Enable minification using Terser (default minifier)
