@@ -28,8 +28,14 @@ class RadiusBase {
         this.initEvent(event);
         const previousState = structuredClone(this.#states[event]);
 
-        // Merge new state with current state
-        this.#states[event] = {...this.#states[event], ...newState};
+        if(newState.constructor === Object) {
+            // Merge new state with current state
+            this.#states[event] = {...this.#states[event], ...newState};
+        }
+        else if(newState.constructor === String || newState.constructor === Array) {
+            // Set specific event value to newState instead of spreading
+            this.#states[event] = newState;
+        }
 
         // Return
         return {
@@ -474,4 +480,3 @@ class RadiusLite extends RadiusLiteBase {
 }
 
 export { Radius, RadiusLite };
-//# sourceMappingURL=radius_state_manager.js.map
