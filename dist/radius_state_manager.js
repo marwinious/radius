@@ -9,7 +9,11 @@ class RadiusBase {
     }
 
     getState(event) {
-        return this.#states[event] || {};
+        if(typeof this.#states[event] != 'undefined') {
+            return this.#states[event]
+        }
+        
+        return {}
     }
 
     setState(event, newState) {
@@ -41,12 +45,15 @@ class RadiusBase {
             this.#states[event] = newState;
         }
 
-        // Return
-        return {
+        // Create return object
+        const returnState = {
             event: event,
             newState: newState,
             previousState: previousState
-        }
+        };
+
+        // Return
+        return returnState
     }
 
     watch(event, property, callbackFn) {
