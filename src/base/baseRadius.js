@@ -99,7 +99,7 @@ export class RadiusBase {
     }
 
     initEvent(event) {
-        if(!this.#states[event]) { 
+        if(typeof this.#states[event] == 'undefined') { 
             this.#states[event] = {};
             this.#events[event] = {
                 subscribers: [],
