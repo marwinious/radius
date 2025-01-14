@@ -25,8 +25,9 @@ describe('subscribe/unsubscribe', () => {
     test('should successfully unsubscribe from event', () => {
         const mockCallback = vi.fn(() => mockResponse)
 
-        radius.subscribe(mockEvent, mockCallback)
-        radius.unsubscribe(mockEvent, mockCallback)
+        const subscriber = radius.subscribe(mockEvent, mockCallback)
+        const unsub = subscriber.unsubscribe()
+        
         radius.setState(mockEvent, mockData)
 
         expect(mockCallback).not.toHaveBeenCalled();
