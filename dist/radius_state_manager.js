@@ -92,7 +92,7 @@ class RadiusBase {
         return {
             event: event,
             callback: callbackFn,
-            unsubscribe: () => { this.unsubscribe(event, callbackFn); }
+            unsubscribe: () => this.unsubscribe(event, callbackFn)
         }
 
     }
