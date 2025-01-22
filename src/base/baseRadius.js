@@ -10,7 +10,11 @@ export class RadiusBase {
     }
 
     getState(event) {
-        return this.#states[event] || {};
+        if(typeof this.#states[event] != 'undefined') {
+            return this.#states[event]
+        }
+        
+        return {}
     }
 
     setState(event, newState) {
@@ -33,17 +37,24 @@ export class RadiusBase {
             // Merge new state with current state
             this.#states[event] = {...this.#states[event], ...newState};
         }
-        else if(newState.constructor === String || newState.constructor === Array) {
+        else if(newState.constructor === String 
+            || newState.constructor === Array 
+            || newState.constructor === Number
+            || newState.constructor === Boolean
+        ) {
             // Set specific event value to newState instead of spreading
             this.#states[event] = newState;
         }
 
-        // Return
-        return {
+        // Create return object
+        const returnState = {
             event: event,
             newState: newState,
             previousState: previousState
         }
+
+        // Return
+        return returnState
     }
 
     watch(event, property, callbackFn) {
@@ -82,13 +93,13 @@ export class RadiusBase {
         return {
             event: event,
             callback: callbackFn,
-            unsubscribe: () => { this.unsubscribe(event, callbackFn); }
+            unsubscribe: () => this.unsubscribe(event, callbackFn)
         }
 
     }
 
     initEvent(event) {
-        if(!this.#states[event]) { 
+        if(typeof this.#states[event] == 'undefined') { 
             this.#states[event] = {};
             this.#events[event] = {
                 subscribers: [],
