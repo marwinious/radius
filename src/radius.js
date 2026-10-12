@@ -4,7 +4,20 @@ export function createState(initialState = {}) {
     const listeners = new Set();
 
     return {
-        getState: () => state,
+        getState: (selector) => {
+            // Check selector type
+            if(typeof selector === 'function') {
+                // If function is passed, return the result of that function with state as the param
+                return selector(state);
+            }
+            else if(selector !== undefined && selector !== null) {
+                // Selector is not undefined/null. Attempt to return the specified piece of state.
+                return state[selector];
+            }
+
+            // If no selector was passed, return full state snapshot
+            return state;
+        },
         setState: (updater, runListeners = true) => {
             // Check updater type
             if (typeof updater === "function") {
