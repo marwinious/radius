@@ -1,7 +1,7 @@
 {
   "name": "radius_state_manager",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "type": "module",
   "directories": {
     "test": "tests"
@@ -14,9 +14,10 @@
     "testui": "vitest --ui"
   },
   "devDependencies": {
-    "@vitest/ui": "^2.1.5",
-    "terser": "^5.36.0",
-    "vite": "^5.4.10",
-    "vitest": "^2.1.5"
-  }
+    "@vitest/ui": "^5.0.4",
+    "terser": "^5.51.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
+  },
+  "packageManager": "yarn@4.5.3+sha512.3003a14012e2987072d244c720506549c1aab73ee728208f1b2580a9fd67b92d61ba6b08fe93f6dce68fd771e3af1e59a0afa28dd242dd0940d73b95fedd4e90"
 }
