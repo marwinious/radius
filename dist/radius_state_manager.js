@@ -1,0 +1,2 @@
+function t(t={}){let e=t;const n=/* @__PURE__ */new Set;return{getState:()=>e,setState:(t,c=!0)=>{e="function"==typeof t?t(e):{...e,...t},!0===c&&n.forEach(t=>t(e))},subscribe:t=>(n.add(t),()=>n.delete(t)),watch:(t,c)=>{let o=t(e);const s=e=>{const n=t(e);if(!Object.is(o,n)){const t=o;o=n,c(n,t)}};return n.add(s),()=>n.delete(s)}}}export{t as createState};
+//# sourceMappingURL=radius_state_manager.js.map
