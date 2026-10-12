@@ -1,5 +1,5 @@
 # Radius Javascript State Manager
-This is a simple, drop-in javascript state management library intended for small or medium projects that don't need a lot of the "extras". 
+This is a simple, drop-in javascript state management library intended for small or medium projects that don't need a lot of the "extras". Test.
 
 Radius uses a simple pub/sub pattern and offers 2 flavors: Simple subscriptions and Event Subscriptions.
 
