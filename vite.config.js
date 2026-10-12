@@ -9,16 +9,26 @@ export default defineConfig({
         format: 'es',
         outDir: 'dist',
         lib: {
-            entry: resolve(__dirname, 'main.js'),
+            entry: resolve(import.meta.dirname, 'main.js'),
             name: "Radius",
             type: "module",
             filename: "radius",
             formats: ['es'], // Ensure it is an ES module format
         },
-        sourcemap: false,
+        sourcemap: true,
         target: 'esnext',
-        minify: false,
-        // minify: terser, // Enable minification using Terser (default minifier)
+        // minify: true,
+        minify: 'terser', // Enable minification using Terser (default minifier)
+        terserOptions: {
+            format: {
+                max_line_len: 0,      // Removes line breaks / collapses to a single line
+                comments: false,       // Strips comments like //#region and /* @__PURE__ */
+            },
+            compress: {
+                drop_console: true,    // Optional: removes console statements
+                passes: 2,             // Extra compression pass
+            },
+        },
         rollupOptions: {
             output: {
                 // You can further customize how the file is named
