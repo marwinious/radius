@@ -306,6 +306,8 @@ Using `.subscribe()` listens for any/all state changes. If you only want to moni
 
 `.watch()` is only looks for CHANGED data. If a watched property is updated in `state` but the value does not change, subscribed callbacks will NOT FIRE.
 
+The callback receives both the updated value and the previous value.
+
 ```javascript
 import { createState } from './radius_state_manager.js';
 
@@ -340,4 +342,146 @@ store.setState({ count: 1 });
 unwatchCount();
 ```
 
+You can also setup a top-level watcher for a property using the string key of that property.
+
+```javascript
+// String key (for top-level properties)
+store.watch('count', (newCount, oldCount) => {
+    console.log(`Count: ${oldCount} -> ${newCount}`);
+});
+```
+
 **Watching deeply nested properties**
+
+Because `.watch()` uses selector functions `(state) => value`, watching nested objects works natively without string-path parsing (`'user.settings.theme'`).
+
+```javascript
+import { createState } from './radius_state_manager.js';
+
+const state = createState({
+    count: 0,
+    user: {
+        name: 'Alice',
+        settings: { theme: 'light' }
+    },
+    items: ['Item A', 'Item B']
+});
+
+// Watch the nested 'theme' setting specifically
+state.watch(
+    (currentState) => currentState.user.settings.theme,
+    (newTheme, oldTheme) => {
+        document.body.setAttribute('data-theme', newTheme);
+        console.log(`[Theme Watcher]: Theme updated from ${oldTheme} to ${newTheme}`);
+    }
+);
+
+// Updating user name DOES NOT trigger the theme watcher
+state.setState((prev) => ({
+    user: { ...prev.user, name: 'Alice Smith' },
+}));
+
+// Updating theme DOES trigger the watcher
+state.setState((prev) => ({
+    user: {
+        ...prev.user,
+        settings: { theme: 'dark' },
+    },
+}));
+// Console Output: "[Theme Watcher]: Theme updated from light to dark"
+```
+
+**Watching computed/derived values**
+
+You can pass a function that computes a result from state (like calculating totals, array lengths, or filtered lists). The watcher only fires if the **computed result** changes.
+
+```javascript
+const cartStore = createState({
+    items: [
+        { name: 'Book', price: 15 },
+        { name: 'Pen', price: 5 }
+    ],
+    couponCode: null
+});
+
+// Watch total cart price
+cartStore.watch(
+    (state) => state.items.reduce((sum, item) => sum + item.price, 0),
+    (newTotal, oldTotal) => {
+        console.log(`[Cart Watcher]: Total changed from $${oldTotal} to $${newTotal}`);
+    }
+);
+
+// Applying a coupon code changes state, but NOT the item prices -> Watcher DOES NOT fire
+cartStore.setState({ couponCode: 'SUMMER10' });
+
+// Adding an item changes the computed sum -> Watcher FIRES
+cartStore.setState((prev) => ({
+    items: [...prev.items, { name: 'Notebook', price: 10 }],
+}));
+// Console Output: "[Cart Watcher]: Total changed from $20 to $30"
+```
+
+**Direct DOM & side-effect binding**
+
+`.watch()` is ideal for syncing state directly to local storage, network calls, or specific DOM elements without re-rendering an entire UI.
+
+```javascript
+const appStore = createState({
+    authToken: null,
+    isLoggedIn: false,
+});
+
+// Sync token to localStorage whenever it changes
+appStore.watch(
+    (state) => state.authToken,
+    (newToken) => {
+        if (newToken) {
+            localStorage.setItem('auth_token', newToken);
+        } else {
+            localStorage.removeItem('auth_token');
+        }
+    }
+);
+
+// Toggle login modal visibility based on status
+appStore.watch(
+    (state) => state.isLoggedIn,
+    (isLoggedIn) => {
+        const modal = document.querySelector('#login-modal');
+        modal.style.display = isLoggedIn ? 'none' : 'block';
+    }
+);
+
+// Trigger both side-effects automatically:
+appStore.setState({
+    authToken: 'abc-123-token',
+    isLoggedIn: true,
+});
+```
+
+**Multiple, independent watchers & isolation**
+
+Multiple watchers can monitor the same or different properties simultaneously. Unsubscribing one watcher will never interfere with active watchers.
+
+```javascript
+const store = createState({ count: 0, title: 'Dashboard' });
+
+const unwatchCount = store.watch(
+    (state) => state.count,
+    (count) => console.log('Count:', count)
+);
+
+const unwatchTitle = store.watch(
+    (state) => state.title,
+    (title) => console.log('Title:', title)
+);
+
+// Unwatch 'count' only
+unwatchCount();
+
+// Update both properties
+store.setState({ count: 10, title: 'Analytics' });
+// Console Output: "Title: Analytics"
+// ('count' watcher is unsubscribed and did not fire)
+```
