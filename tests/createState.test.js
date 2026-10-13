@@ -17,6 +17,7 @@ describe("createState", () => {
             })
         })
     })
+
     // -------------------------------------------------------------
     // New Tests: getState with Selectors & Keys
     // -------------------------------------------------------------
@@ -134,6 +135,54 @@ describe("createState", () => {
 
             expect(callback).toHaveBeenCalledTimes(1)
             expect(callback).toHaveBeenCalledWith(1, 0) // (newValue, oldValue)
+        })
+
+        it("should watch a top-level property using a string key", () => {
+            const store = createState({ count: 0, theme: "light" })
+            const callback = vi.fn()
+
+            store.watch("count", callback)
+
+            store.setState({ count: 1 })
+
+            expect(callback).toHaveBeenCalledTimes(1)
+            expect(callback).toHaveBeenCalledWith(1, 0) // (newValue, oldValue)
+        })
+
+        it("should NOT trigger string key watcher if unrelated property changes or value is unchanged", () => {
+            const store = createState({ count: 0, theme: "light" })
+            const callback = vi.fn()
+
+            store.watch("theme", callback)
+
+            // 1. Update unrelated property
+            store.setState({ count: 5 })
+            expect(callback).not.toHaveBeenCalled()
+
+            // 2. Update theme with same value
+            store.setState({ theme: "light" })
+            expect(callback).not.toHaveBeenCalled()
+
+            // 3. Update theme with new value
+            store.setState({ theme: "dark" })
+            expect(callback).toHaveBeenCalledTimes(1)
+            expect(callback).toHaveBeenCalledWith("dark", "light")
+        })
+
+        it("should allow unsubscribing a string key watcher", () => {
+            const store = createState({ status: "idle" })
+            const callback = vi.fn()
+
+            const unwatch = store.watch("status", callback)
+
+            store.setState({ status: "loading" })
+            expect(callback).toHaveBeenCalledWith("loading", "idle")
+
+            // Unwatch
+            unwatch()
+
+            store.setState({ status: "success" })
+            expect(callback).toHaveBeenCalledTimes(1)
         })
 
         it("should NOT trigger callback if watched value did not change", () => {
