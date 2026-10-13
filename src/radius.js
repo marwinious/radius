@@ -42,13 +42,19 @@ export function createState(initialState = {}) {
             return () => listeners.delete(fn)
         },
         watch: (selector, callback) => {
+            // Convert string keys (e.g. 'count') into selector functions
+            let selectFn = selector;
+            if(typeof selector !== 'function') {
+                selectFn = (state) => state[selector];
+            }
+
             // Set original value when watcher is created
-            let prevValue = selector(state)
+            let prevValue = selectFn(state)
 
             // Create the internal subscriber function
             const watcherListener = (nextState) => {
                 // Get the "new state" value supplied in the watch call
-                const nextValue = selector(nextState)
+                const nextValue = selectFn(nextState)
 
                 // Check if the previous and new values are different
                 if (!Object.is(prevValue, nextValue)) {
