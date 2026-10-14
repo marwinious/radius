@@ -97,7 +97,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30]
 }
 
@@ -120,7 +120,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30]
 }
 
@@ -145,7 +145,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30]
 }
 
@@ -164,7 +164,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30]
 }
 
@@ -184,7 +184,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30]
 }
 
@@ -210,7 +210,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30]
 }
 
@@ -233,7 +233,7 @@ import { createState } from 'path-to-radius'
 const defaultState = {
     count: 0,
     theme: 'dark',
-    user: { name: 'Alice', role: 'admin' }
+    user: { name: 'Alice', role: 'admin' },
     items: [10, 20, 30],
     isSidebarOpen: false
 }
