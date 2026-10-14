@@ -1,2 +1,41 @@
-function t(t={}){let e=t;const n=/* @__PURE__ */new Set;return{getState:t=>"function"==typeof t?t(e):null!=t?e[t]:e,setState:(t,o=!0)=>{e="function"==typeof t?t(e):{...e,...t},!0===o&&n.forEach(t=>t(e))},subscribe:t=>(n.add(t),()=>n.delete(t)),watch:(t,o)=>{let c=t;"function"!=typeof t&&(c=e=>e[t]);let f=c(e);const s=t=>{const e=c(t);if(!Object.is(f,e)){const t=f;f=e,o(e,t)}};return n.add(s),()=>n.delete(s)}}}export{t as createState};
-//# sourceMappingURL=radius_state_manager.js.map
+//#region src/radius.js
+function createState(initialState = {}) {
+	let state = initialState;
+	const listeners = /* @__PURE__ */ new Set();
+	return {
+		getState: (selector) => {
+			if (typeof selector === "function") return selector(state);
+			else if (selector !== void 0 && selector !== null) return state[selector];
+			return state;
+		},
+		setState: (updater, runListeners = true) => {
+			if (typeof updater === "function") state = updater(state);
+			else state = {
+				...state,
+				...updater
+			};
+			if (runListeners === true) listeners.forEach((fn) => fn(state));
+		},
+		subscribe: (fn) => {
+			listeners.add(fn);
+			return () => listeners.delete(fn);
+		},
+		watch: (selector, callback) => {
+			let selectFn = selector;
+			if (typeof selector !== "function") selectFn = (state) => state[selector];
+			let prevValue = selectFn(state);
+			const watcherListener = (nextState) => {
+				const nextValue = selectFn(nextState);
+				if (!Object.is(prevValue, nextValue)) {
+					const oldValue = prevValue;
+					prevValue = nextValue;
+					callback(nextValue, oldValue);
+				}
+			};
+			listeners.add(watcherListener);
+			return () => listeners.delete(watcherListener);
+		}
+	};
+}
+//#endregion
+export { createState };
