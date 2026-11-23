@@ -1,4 +1,3 @@
-import { Radius } from "./src/radius";
-import { RadiusLite } from "./src/radiusLite";
+import { createState } from "./src/radius.js";
 
-export { Radius, RadiusLite }
+export { createState }
